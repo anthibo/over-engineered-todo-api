@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "apps/todo-main-api/src",
+  "compilerOptions": {
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/todo-main-api/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/todo-main-api",
+  "projects": {
+    "todo-main-api": {
+      "type": "application",
+      "root": "apps/todo-main-api",
+      "entryFile": "main",
+      "sourceRoot": "apps/todo-main-api/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/todo-main-api/tsconfig.app.json"
+      }
+    },
+    "todo-history-persistence": {
+      "type": "application",
+      "root": "apps/todo-history-persistence",
+      "entryFile": "main",
+      "sourceRoot": "apps/todo-history-persistence/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/todo-history-persistence/tsconfig.app.json"
+      }
+    }
+  }
+}

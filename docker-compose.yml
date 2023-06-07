@@ -1,0 +1,29 @@
+services:
+  todo-main-api:
+    build:
+      context: .
+      dockerfile: ./apps/todo-main-api/Dockerfile
+      target: development
+    command: pnpm run start:dev todo-main-api
+    env_file:
+      - ./apps/todo-main-api/.env
+    ports:
+      - '3000:3000'
+    volumes:
+    - .:/usr/src/app
+
+  todo-history-persistence:
+    build:
+      context: .
+      dockerfile: ./apps/todo-history-persistence/Dockerfile
+      target: development
+    command: pnpm run start:dev todo-history-persistence
+    env_file:
+      - ./apps/todo-history-persistence/.env
+    ports:
+      - '3003:3003'
+    volumes:
+    - .:/usr/src/app
+
+  mysql:
+    image: mysql:5.7
