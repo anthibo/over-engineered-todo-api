@@ -3,17 +3,15 @@ FROM node:alpine As development
 WORKDIR /usr/src/app
 
 COPY package.json ./
-COPY pnpm-lock.yaml ./
+COPY yarn-lock.yaml ./
 COPY tsconfig.json tsconfig.json
 COPY nest-cli.json nest-cli.json
 
-RUN npm install -g pnpm
-
 COPY apps/todo-history-persistence apps/todo-history-persistence
 
-RUN pnpm install -r 
+RUN yarn
 
-RUN pnpm run build payments
+RUN yarn build payments
 
 FROM node:alpine as production
 
@@ -23,11 +21,10 @@ ENV NODE_ENV=${NODE_ENV}
 WORKDIR /usr/src/app
 
 COPY package.json ./
-COPY pnpm-lock.yaml ./
+COPY yarn.lock ./
 
-RUN npm install -g pnpm
 
-RUN pnpm install --prod
+RUN yarn
 
 COPY --from=development /usr/src/app/dist ./dist
 

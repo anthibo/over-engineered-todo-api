@@ -7,13 +7,11 @@ COPY pnpm-lock.yaml ./
 COPY tsconfig.json tsconfig.json
 COPY nest-cli.json nest-cli.json
 
-RUN npm install -g pnpm
-
 COPY apps/todo-main-api apps/todo-main-api
 
-RUN pnpm install -r 
+RUN yarn install 
 
-RUN pnpm run build payments
+RUN yarn run build payments
 
 FROM node:alpine as production
 
@@ -25,9 +23,7 @@ WORKDIR /usr/src/app
 COPY package.json ./
 COPY pnpm-lock.yaml ./
 
-RUN npm install -g pnpm
-
-RUN pnpm install --prod
+RUN yarn install --prod
 
 COPY --from=development /usr/src/app/dist ./dist
 
