@@ -1,18 +1,14 @@
-// import {
-//   UnprocessableEntityException,
-//   InternalServerErrorException,
-// } from '@nestjs/common';
 import { AggregateRoot } from '@nestjs/cqrs';
 
-// import { ErrorMessage } from './error-messages';
 import { TodoStatusUpdatedEvent } from './event/todo-updated.event';
 import { TodoDeletedEvent } from './event/todo-deleted.event';
+import { TodoCreatedEvent } from './event/todo-created.event';
 
 export type TodoEssentialProperties = Readonly<
   Required<{
     id: string;
     title: string;
-    userId: string;
+    userId: number;
     status: TodoStatus;
   }>
 >;
@@ -29,7 +25,6 @@ export type TodoProperties = TodoEssentialProperties &
   Required<TodoOptionalProperties>;
 
 export interface Todo {
-  compareId: (id: string) => boolean;
   updateStatus: (status: TodoStatus) => void;
   updateDeletedAt: () => void;
   commit: () => void;
@@ -52,10 +47,7 @@ export class TodoImplement extends AggregateRoot implements Todo {
   constructor(properties: TodoProperties) {
     super();
     Object.assign(this, properties);
-  }
-
-  compareId(id: string): boolean {
-    return id === this.id;
+    this.apply(new TodoCreatedEvent(this.id, this.userId, this.createdAt));
   }
 
   updateStatus(status: TodoStatus) {

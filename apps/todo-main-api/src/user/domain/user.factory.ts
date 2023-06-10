@@ -1,34 +1,31 @@
+import { v4 as uuid } from 'uuid';
 import { Inject } from '@nestjs/common';
 import { EventPublisher } from '@nestjs/cqrs';
-import { v4 as uuid } from 'uuid';
 
-import { Todo, TodoImplement, TodoProperties, TodoStatus } from './Todo';
+import { User, UserImplement, UserProperties } from './User';
 
-type CreateTodoOptions = Readonly<{
-  title: string;
-  userId: number;
-  status: TodoStatus;
+type CreateUserOptions = Readonly<{
+  name: string;
 }>;
 
-export class TodoFactory {
+export class UserFactory {
   @Inject(EventPublisher) private readonly eventPublisher: EventPublisher;
 
-  create(options: CreateTodoOptions): Todo {
+  create(options: CreateUserOptions): User {
     return this.eventPublisher.mergeObjectContext(
-      new TodoImplement({
+      new UserImplement({
         ...options,
         id: uuid(),
         createdAt: new Date(),
         updatedAt: new Date(),
         deletedAt: null,
-        status: TodoStatus.IN_PROGRESS,
       }),
     );
   }
 
-  reconstitute(properties: TodoProperties): Todo {
+  reconstitute(properties: UserProperties): User {
     return this.eventPublisher.mergeObjectContext(
-      new TodoImplement(properties),
+      new UserImplement(properties),
     );
   }
 }

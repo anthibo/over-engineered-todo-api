@@ -1,35 +1,49 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
-import { TodoService } from '../todo.service';
+import { Resolver, Query, Mutation, Args, Subscription } from '@nestjs/graphql';
 import { TodoDto } from './dto/todo.dto';
 import { CreateTodoDto } from './dto/create-todo.dto';
-import { UpdateTodoStatus } from './dto/update-todo.dto';
+import { UpdateTodoStatus } from './dto/update-todo-status.dto';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { CreateTodoCommand } from '../application/command/create-todo/create-todo.command';
+import { MessageResponseDto } from './dto/message-response.dto';
+import { DeleteTodoDto } from './dto/delete-todo.dto';
+import { FindAllQuery } from '../application/query/find-all/find-all.query';
+import { FindAllResult } from '../application/query/find-all/find-all.result';
+import { UpdateTodoStatusCommand } from '../application/command/update-todo-status/update-todo-status.command';
+import { DeleteTodoCommand } from '../application/command/delete-todo/delete-todo.command';
 
 @Resolver(() => TodoDto)
 export class TodoResolver {
-  constructor(private readonly todoService: TodoService) {}
+  constructor(readonly commandBus: CommandBus, readonly queryBus: QueryBus) {}
 
-  @Mutation(() => TodoDto)
-  createTodo(@Args('createTodoInput') createTodoInput: CreateTodoDto) {
-    return this.todoService.createTodo(createTodoInput);
+  @Query(() => [TodoDto], { name: 'todos' })
+  async findTodos(): Promise<TodoDto[]> {
+    const query = new FindAllQuery();
+    const { todos } = await this.queryBus.execute<FindAllQuery, FindAllResult>(
+      query,
+    );
+    return todos as unknown as TodoDto[];
   }
 
-  @Query(() => [TodoDto], { name: 'todo' })
-  findAll() {
-    return this.todoService.findAll();
+  @Mutation(() => MessageResponseDto)
+  async createTodo(
+    @Args('createTodoInput') createTodoInput: CreateTodoDto,
+  ): Promise<MessageResponseDto> {
+    const command = new CreateTodoCommand(createTodoInput);
+    await this.commandBus.execute(command);
+    return { message: 'creating new todo' };
   }
 
-  @Query(() => TodoDto, { name: 'todo' })
-  findOne(@Args('id', { type: () => Int }) id: string) {
-    return this.todoService.findOne(id);
+  @Mutation(() => MessageResponseDto)
+  async updateTodo(@Args('updateTodoInput') updateTodoInput: UpdateTodoStatus) {
+    const command = new UpdateTodoStatusCommand(updateTodoInput);
+    await this.commandBus.execute(command);
+    return { message: 'update todo' };
   }
 
-  @Mutation(() => TodoDto)
-  updateTodo(@Args('updateTodoInput') updateTodoInput: UpdateTodoStatus) {
-    return this.todoService.update(updateTodoInput.todoId, updateTodoInput);
-  }
-
-  @Mutation(() => TodoDto)
-  removeTodo(@Args('id', { type: () => Int }) id: string) {
-    return this.todoService.delete(id);
+  @Mutation(() => MessageResponseDto)
+  async deleteTodo(@Args('deleteTodoInput') deleteTodoInput: DeleteTodoDto) {
+    const command = new DeleteTodoCommand(deleteTodoInput);
+    await this.commandBus.execute(command);
+    return { message: 'delete todo' };
   }
 }

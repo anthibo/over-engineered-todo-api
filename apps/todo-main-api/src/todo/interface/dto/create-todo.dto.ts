@@ -6,5 +6,5 @@ export class CreateTodoDto {
   title: string;
 
   @Field({ description: 'The user id that is assigned to the task' })
-  userId: string;
+  userId: number;
 }

@@ -1,9 +1,7 @@
-import { InputType, Field } from '@nestjs/graphql';
-import { IsNotEmpty } from 'class-validator';
+import { InputType, Field, Int } from '@nestjs/graphql';
 
 @InputType()
 export class DeleteTodoDto {
-  @Field({ description: 'Todo id that is desired to be deleted' })
-  @IsNotEmpty()
-  todoId: string;
+  @Field(() => Int, { description: 'Todo id that is desired to be deleted' })
+  todoId: number;
 }
