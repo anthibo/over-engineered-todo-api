@@ -1,7 +1,7 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { TodoDto } from './dto/todo.dto';
 import { CreateTodoDto } from './dto/create-todo.dto';
-import { UpdateTodoStatus } from './dto/update-todo-status.dto';
+import { UpdateTodoStatusDto } from './dto/update-todo-status.dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateTodoCommand } from '../application/command/create-todo/create-todo.command';
 import { MessageResponseDto } from './dto/message-response.dto';
@@ -34,7 +34,9 @@ export class TodoResolver {
   }
 
   @Mutation(() => MessageResponseDto)
-  async updateTodo(@Args('updateTodoInput') updateTodoInput: UpdateTodoStatus) {
+  async updateTodo(
+    @Args('updateTodoInput') updateTodoInput: UpdateTodoStatusDto,
+  ) {
     const command = new UpdateTodoStatusCommand(updateTodoInput);
     await this.commandBus.execute(command);
     return { message: 'todo updated' };

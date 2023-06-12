@@ -1,8 +1,9 @@
-import { Todo } from './Todo';
+import { Todo, TodoStatus } from './Todo';
 
 export interface TodoRepository {
-  findById(id: number): Promise<Todo | null>;
+  findById(id: string): Promise<Todo | null>;
   save(todo: Todo): Promise<void>;
   findAll: () => Promise<Todo[]>;
-  deleteById: (id: number) => Promise<void>;
+  deleteById: (id: string) => Promise<void>;
+  update: (id: string, updatedStatus: TodoStatus) => Promise<void>;
 }

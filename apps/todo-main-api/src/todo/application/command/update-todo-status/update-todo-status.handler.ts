@@ -22,7 +22,7 @@ export class UpdateTodoStatusHandler
       throw new NotFoundException(ErrorMessage.TASK_IS_NOT_FOUND);
     }
     todo.updateStatus(status);
-    await this.todoRepository.save(todo);
+    await this.todoRepository.update(todoId, status);
     todo.commit();
   }
 }
