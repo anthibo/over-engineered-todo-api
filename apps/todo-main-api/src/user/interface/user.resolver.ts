@@ -1,8 +1,11 @@
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { MessageResponseDto } from '../../todo/interface/dto/message-response.dto';
 import { SeedUsersCommand } from '../application/command/seed-users/seed-users.command';
 import { SeedUsersDto } from './dto/seed-users.dto';
+import { FindUsersQuery } from '../application/query/find-users/find-users.query';
+import { UserDto } from './dto/user.dto';
+import { FindUsersResult } from '../application/query/find-users/find-users.result';
 
 @Resolver()
 export class UserResolver {
@@ -15,5 +18,15 @@ export class UserResolver {
     const command = new SeedUsersCommand(numberOfUsers);
     await this.commandBus.execute(command);
     return { message: 'seed succeeded' };
+  }
+
+  @Query(() => [UserDto], { name: 'users' })
+  async findUsers(): Promise<UserDto[]> {
+    const query = new FindUsersQuery();
+    const { users } = await this.queryBus.execute<
+      FindUsersQuery,
+      FindUsersResult
+    >(query);
+    return users as unknown as UserDto[];
   }
 }

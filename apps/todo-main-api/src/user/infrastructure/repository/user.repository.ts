@@ -1,35 +1,29 @@
 import { InjectModel } from '@nestjs/sequelize';
 import { UserRepository } from '../../domain/user.repository.interface';
-import { User, UserProperties } from '../../domain/User';
-import { UserFactory } from '../../domain/user.factory';
+import { User } from '../../domain/User';
 import { UserEntity } from '../entity/user.entity';
+import { UserDataMapper } from '../mappers/user.data.mapper';
 
 export class UserRepositoryImpl implements UserRepository {
   constructor(
     @InjectModel(UserEntity)
     private readonly userDBEntity: typeof UserEntity,
-    private readonly userFactory: UserFactory,
+    private readonly userDataMapper: UserDataMapper,
   ) {}
+  async findUserById(id: string) {
+    const userEntity = await this.userDBEntity.findByPk(id);
+    return userEntity ? this.userDataMapper.toDomainModel(userEntity) : null;
+  }
+
+  async findUsers() {
+    const userEntities = await this.userDBEntity.findAll();
+    return userEntities.map((userEntity) =>
+      this.userDataMapper.toDomainModel(userEntity),
+    );
+  }
+
   async createUser(user: User) {
-    const userEntity = this.modelToEntity(user);
+    const userEntity = this.userDataMapper.toPersistenceEntity(user);
     userEntity.save();
-  }
-
-  // DATA MAPPERS
-  private modelToEntity(model: User): UserEntity {
-    const properties = JSON.parse(JSON.stringify(model)) as UserProperties;
-    return Object.assign(new UserEntity(), {
-      ...properties,
-    });
-  }
-
-  private entityToModel(entity: UserEntity): User {
-    return this.userFactory.reconstitute({
-      id: entity.id,
-      createdAt: entity.createdAt,
-      deletedAt: entity.deletedAt,
-      updatedAt: entity.updatedAt,
-      name: entity.name,
-    });
   }
 }

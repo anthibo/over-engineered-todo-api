@@ -7,19 +7,25 @@ import { UserRepositoryImpl } from './infrastructure/repository/user.repository'
 import { UserFactory } from './domain/user.factory';
 import { CqrsModule } from '@nestjs/cqrs';
 import { SeedUsersHandler } from './application/command/seed-users/seed-users.handler';
+import { FindUsersHandler } from './application/query/find-users/find-users.handler';
+import { UserDataMapper } from './infrastructure/mappers/user.data.mapper';
+import { FindUserHandler } from './application/query/find-user/find-user.handler';
 
 const ApplicationLayerProviders = [
   // command handlers
   SeedUsersHandler,
   // query handlers
+  FindUserHandler,
+  FindUsersHandler,
   // sagas
 ];
 
-const InfrastructureLayerProviders: Provider[] = [
+export const InfrastructureLayerProviders: Provider[] = [
   {
     provide: InjectionToken.USER_REPOSITORY,
     useClass: UserRepositoryImpl,
   },
+  UserDataMapper,
 ];
 
 const InterfaceLayerProviders: Provider[] = [UserResolver];
@@ -34,5 +40,6 @@ const DomainLayerProviders = [UserFactory];
     ...InfrastructureLayerProviders,
     ...DomainLayerProviders,
   ],
+  exports: [...InfrastructureLayerProviders],
 })
 export class UserModule {}

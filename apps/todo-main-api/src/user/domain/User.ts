@@ -18,8 +18,9 @@ export type UserOptionalProperties = Readonly<
 export type UserProperties = UserEssentialProperties &
   Required<UserOptionalProperties>;
 
-export interface User {
+export interface User extends AggregateRoot {
   commit: () => void;
+  getId(): string;
 }
 
 export class UserImplement extends AggregateRoot implements User {
@@ -32,5 +33,10 @@ export class UserImplement extends AggregateRoot implements User {
   constructor(properties: UserProperties) {
     super();
     Object.assign(this, properties);
+    this.getId = this.getId.bind(this);
+  }
+
+  getId(): string {
+    return this.id;
   }
 }

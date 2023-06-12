@@ -1,8 +1,15 @@
-import { Table, Column, Model } from 'sequelize-typescript';
+import {
+  Table,
+  Column,
+  Model,
+  BelongsTo,
+  ForeignKey,
+} from 'sequelize-typescript';
 import { TodoStatus } from '../../domain/Todo';
+import { UserEntity } from 'apps/todo-main-api/src/user/infrastructure/entity/user.entity';
 
 @Table({ tableName: 'todo' })
-export class TodoEntity extends Model {
+export class TodoEntity extends Model<TodoEntity> {
   @Column({ primaryKey: true, unique: true })
   id: string;
 
@@ -15,7 +22,10 @@ export class TodoEntity extends Model {
   })
   status: string;
 
-  // TODO: Add user's relation here
+  @ForeignKey(() => UserEntity)
   @Column
-  user: number;
+  userId: string;
+
+  @BelongsTo(() => UserEntity)
+  user: UserEntity;
 }

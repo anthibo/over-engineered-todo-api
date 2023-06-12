@@ -3,10 +3,11 @@ import { EventPublisher } from '@nestjs/cqrs';
 import { v4 as uuid } from 'uuid';
 
 import { Todo, TodoImplement, TodoProperties, TodoStatus } from './Todo';
+import { User } from '../../user/domain/User';
 
 type CreateTodoOptions = Readonly<{
   title: string;
-  userId: number;
+  user: User;
   status: TodoStatus;
 }>;
 
@@ -17,6 +18,7 @@ export class TodoFactory {
     return this.eventPublisher.mergeObjectContext(
       new TodoImplement({
         ...options,
+        user: options.user,
         id: uuid(),
         createdAt: new Date(),
         updatedAt: new Date(),

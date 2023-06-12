@@ -14,7 +14,11 @@ export class TodoSaga {
     return events$.pipe(
       ofType(TodoCreatedEvent),
       map((event) => {
-        return this.logger.debug(`TodoCreatedSaga for todoId: ${event.todoId}`);
+        return this.logger.debug(
+          `TodoCreatedSaga for todoId: ${
+            event.todoId
+          } with userId: ${JSON.stringify(event.user)}`,
+        );
       }),
     );
   };

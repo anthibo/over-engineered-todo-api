@@ -11,6 +11,8 @@ import { InjectionToken } from './application/injection-tokens';
 import { TodoFactory } from './domain/todo.factory';
 import { TodoSaga } from './application/saga/todo.saga';
 import { FindAllHandler } from './application/query/find-all/find-all.handler';
+import { TodoDataMapper } from './infrastructure/mappers/todo.data.mapper';
+import { UserModule } from '../user/user.module';
 
 const ApplicationLayerProviders = [
   // command handlers
@@ -28,6 +30,7 @@ const InfrastructureLayerProviders: Provider[] = [
     provide: InjectionToken.TODO_REPOSITORY,
     useClass: TodoRepositoryImpl,
   },
+  TodoDataMapper,
 ];
 
 const InterfaceLayerProviders: Provider[] = [TodoResolver];
@@ -35,8 +38,7 @@ const InterfaceLayerProviders: Provider[] = [TodoResolver];
 const DomainLayerProviders = [TodoFactory];
 
 @Module({
-  // TODO: make dependencies more readable
-  imports: [CqrsModule, SequelizeModule.forFeature([TodoEntity])],
+  imports: [UserModule, CqrsModule, SequelizeModule.forFeature([TodoEntity])],
   providers: [
     ...InterfaceLayerProviders,
     ...ApplicationLayerProviders,

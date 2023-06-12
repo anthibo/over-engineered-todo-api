@@ -3,12 +3,13 @@ import { AggregateRoot } from '@nestjs/cqrs';
 import { TodoStatusUpdatedEvent } from './event/todo-updated.event';
 import { TodoDeletedEvent } from './event/todo-deleted.event';
 import { TodoCreatedEvent } from './event/todo-created.event';
+import { User } from '../../user/domain/User';
 
 export type TodoEssentialProperties = Readonly<
   Required<{
     id: string;
     title: string;
-    userId: number;
+    user: User;
     status: TodoStatus;
   }>
 >;
@@ -24,7 +25,7 @@ export type TodoOptionalProperties = Readonly<
 export type TodoProperties = TodoEssentialProperties &
   Required<TodoOptionalProperties>;
 
-export interface Todo {
+export interface Todo extends AggregateRoot {
   updateStatus: (status: TodoStatus) => void;
   updateDeletedAt: () => void;
   commit: () => void;
@@ -38,7 +39,7 @@ export enum TodoStatus {
 export class TodoImplement extends AggregateRoot implements Todo {
   private readonly id: string;
   private readonly title: string;
-  private readonly userId: string;
+  private readonly user: User;
   private status: TodoStatus;
   private readonly createdAt: Date;
   private updatedAt: Date;
@@ -47,7 +48,7 @@ export class TodoImplement extends AggregateRoot implements Todo {
   constructor(properties: TodoProperties) {
     super();
     Object.assign(this, properties);
-    this.apply(new TodoCreatedEvent(this.id, this.userId, this.createdAt));
+    this.apply(new TodoCreatedEvent(this.id, this.user, this.createdAt));
   }
 
   updateStatus(status: TodoStatus) {
@@ -57,7 +58,7 @@ export class TodoImplement extends AggregateRoot implements Todo {
       new TodoStatusUpdatedEvent(
         this.id,
         this.status,
-        this.userId,
+        this.user,
         this.updatedAt,
       ),
     );
@@ -65,6 +66,6 @@ export class TodoImplement extends AggregateRoot implements Todo {
 
   updateDeletedAt() {
     this.deletedAt = new Date();
-    this.apply(new TodoDeletedEvent(this.id, this.userId, this.deletedAt));
+    this.apply(new TodoDeletedEvent(this.id, this.user, this.deletedAt));
   }
 }

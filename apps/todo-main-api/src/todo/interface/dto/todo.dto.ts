@@ -1,16 +1,18 @@
-import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType } from '@nestjs/graphql';
+import { UserDto } from 'apps/todo-main-api/src/user/interface/dto/user.dto';
 
 @ObjectType()
 export class TodoDto {
-  @Field(() => Int, { description: 'Todo id' })
-  id: number;
+  @Field({ description: 'Todo id' })
+  id: string;
 
   @Field({ description: 'Todo title' })
   title: string;
 
-  //TODO: add user object type;
-  @Field(() => Int, { description: 'The user id that is assigned to the task' })
-  user: number;
+  @Field(() => UserDto, {
+    description: 'The user that is assigned to the task',
+  })
+  user: UserDto;
 
   @Field({ description: 'The task creation date' })
   createdAt: Date;

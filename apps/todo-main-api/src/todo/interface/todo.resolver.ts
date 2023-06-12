@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args, Subscription } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { TodoDto } from './dto/todo.dto';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoStatus } from './dto/update-todo-status.dto';
@@ -30,20 +30,20 @@ export class TodoResolver {
   ): Promise<MessageResponseDto> {
     const command = new CreateTodoCommand(createTodoInput);
     await this.commandBus.execute(command);
-    return { message: 'creating new todo' };
+    return { message: 'todo created' };
   }
 
   @Mutation(() => MessageResponseDto)
   async updateTodo(@Args('updateTodoInput') updateTodoInput: UpdateTodoStatus) {
     const command = new UpdateTodoStatusCommand(updateTodoInput);
     await this.commandBus.execute(command);
-    return { message: 'update todo' };
+    return { message: 'todo updated' };
   }
 
   @Mutation(() => MessageResponseDto)
   async deleteTodo(@Args('deleteTodoInput') deleteTodoInput: DeleteTodoDto) {
     const command = new DeleteTodoCommand(deleteTodoInput);
     await this.commandBus.execute(command);
-    return { message: 'delete todo' };
+    return { message: 'todo deleted' };
   }
 }
