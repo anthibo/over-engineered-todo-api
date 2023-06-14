@@ -1,0 +1,3 @@
+export enum InjectionToken {
+  TODO_HISTORY_REPOSITORY = 'TODO_HISTORY_REPOSITORY',
+}

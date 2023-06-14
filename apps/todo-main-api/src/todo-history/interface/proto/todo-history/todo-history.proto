@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package todo_history;
+
+service TodoHistoryService {
+  rpc CreateTodoHistory(CreateTodoHistoryDto) returns (CreateTodoHistoryResponse) {}
+}
+
+message CreateTodoHistoryResponse {
+  string id = 1;
+  string description = 2;
+}
+
+message CreateTodoHistoryDto {
+    string description = 1;
+}
+
