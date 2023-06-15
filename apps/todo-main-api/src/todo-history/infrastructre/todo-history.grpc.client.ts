@@ -32,14 +32,15 @@ export class TodoHistoryGrpcClient implements OnModuleInit {
 
   async createTodoHistory(createHistoryDto: CreateTodoHistoryDto) {
     this.logger.debug(
-      `sending new grpc request for history-persistence service`,
+      `sending new grpc request to history-persistence service`,
     );
-    return this.historyPersistenceGrpcService
-      .createTodoHistory(createHistoryDto)
-      .pipe(
-        map(async ({ message }) => {
-          this.logger.debug(message);
-        }),
-      );
+    return this.historyPersistenceGrpcService.createTodoHistory(
+      createHistoryDto,
+    );
+    // .pipe(
+    //   map(async ({ message }) => {
+    //     this.logger.debug(message);
+    //   }),
+    // );
   }
 }

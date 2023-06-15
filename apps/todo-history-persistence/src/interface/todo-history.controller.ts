@@ -7,15 +7,25 @@ import { CreateTodoHistoryCommand } from '../application/command/create-todo-his
 @Controller()
 export class TodoHistoryController {
   private readonly logger = new Logger(TodoHistoryController.name);
-  constructor(private readonly commandBus: CommandBus) {}
+  constructor(readonly commandBus: CommandBus) {}
   @GrpcMethod(TODO_HISTORY_PROTO_SERVICE, 'CreateTodoHistory')
-  async create(@Payload() createTodoHistoryDto: CreateTodoHistoryDto) {
+  async create(
+    @Payload() createTodoHistoryDto: CreateTodoHistoryDto,
+  ): Promise<{ message: string }> {
     this.logger.debug(
       `history-persistence service received new update: ${JSON.stringify(
         createTodoHistoryDto,
       )}`,
     );
-    const command = new CreateTodoHistoryCommand(createTodoHistoryDto);
-    return await this.commandBus.execute(command);
+    const command = new CreateTodoHistoryCommand({
+      description: createTodoHistoryDto.description,
+    });
+    this.logger.debug(
+      `history-persistence service received new update: ${JSON.stringify(
+        command,
+      )}`,
+    );
+    await this.commandBus.execute(command);
+    return { message: 'history created' };
   }
 }

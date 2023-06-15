@@ -9,6 +9,12 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT');
+  console.log(
+    `${configService.get('HISTORY_PERSISTENCE_HOST')}:${configService.get(
+      'HISTORY_PERSISTENCE_PORT',
+    )}`,
+  );
+  app.enableCors();
 
   await app.listen(port);
 }

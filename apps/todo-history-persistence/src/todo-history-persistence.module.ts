@@ -1,45 +1,17 @@
-import { Module, Provider } from '@nestjs/common';
-import { TodoHistoryController } from './interface/todo-history.controller';
-import { TodoHistoryFactory } from './domain/todo-history.factory';
-import { TodoHistoryDataMapper } from './infrastructure/mapper/todo-history.data.mapper';
-import { InjectionToken } from './application/injection-tokens';
-import { TodoHistoryRepositoryImpl } from './infrastructure/repository/todo-history.repository';
-import { CreateTodoHistoryCommand } from './application/command/create-todo-history/create-todo-history.command';
-import { TodoHistoryEntity } from './infrastructure/entity/todo-history.entity';
-import { CqrsModule } from '@nestjs/cqrs';
-import {
-  DatabaseModule,
-  TODO_HISTORY_PROTO_PACKAGE,
-  TODO_MAIN_API_SERVICE,
-} from '@app/common';
+import { Module } from '@nestjs/common';
+
+import { TODO_HISTORY_PROTO_PACKAGE, TODO_MAIN_API_SERVICE } from '@app/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { join } from 'path';
-import { CreateTodoHistoryHandler } from './application/command/create-todo-history/create-todo-history';
-
-const ApplicationLayerProviders = [
-  // command handlers
-  CreateTodoHistoryHandler,
-  // sagas
-];
-
-export const InfrastructureLayerProviders: Provider[] = [
-  {
-    provide: InjectionToken.TODO_HISTORY_REPOSITORY,
-    useClass: TodoHistoryRepositoryImpl,
-  },
-  TodoHistoryDataMapper,
-];
-
-const InterfaceLayerProviders: Provider[] = [];
-
-const DomainLayerProviders = [TodoHistoryFactory];
+import { ApplicationLayerModule } from './application/application.module';
+import { InfrastructureLayerModule } from './infrastructure/infrastructure.module';
+import { InterfaceLayerModule } from './interface/interface.module';
+import { DomainLayerModule } from './domain/domain.module';
 
 @Module({
   imports: [
-    DatabaseModule,
-    DatabaseModule.forFeature([TodoHistoryEntity]),
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
@@ -81,14 +53,10 @@ const DomainLayerProviders = [TodoHistoryFactory];
         inject: [ConfigService],
       },
     ]),
-    CqrsModule,
-  ],
-  controllers: [TodoHistoryController],
-  providers: [
-    ...ApplicationLayerProviders,
-    ...InfrastructureLayerProviders,
-    ...InterfaceLayerProviders,
-    ...DomainLayerProviders,
+    DomainLayerModule,
+    ApplicationLayerModule,
+    InfrastructureLayerModule,
+    InterfaceLayerModule,
   ],
 })
 export class TodoHistoryPersistenceModule {}
