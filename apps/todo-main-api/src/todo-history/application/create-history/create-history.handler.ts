@@ -9,13 +9,15 @@ export class CreateHistoryHandler
   implements ICommandHandler<CreateHistoryCommand>
 {
   private readonly logger = new Logger(CreateHistoryHandler.name);
-  constructor(private readonly todoHistoryGrpcClient: TodoHistoryGrpcClient) {}
+  constructor(
+    private readonly todoHistoryGrpcClient: TodoHistoryGrpcClient, // private publisher: EventPublisher,
+  ) {}
 
   async execute({ description }: CreateHistoryCommand): Promise<void> {
     this.logger.debug(`Handling CreateHistoryCommand`);
-    (await this.todoHistoryGrpcClient.createTodoHistory({ description })).pipe(
-      map(async ({ message }) => {
-        this.logger.debug(`received grpc response: ${message}`);
+    this.todoHistoryGrpcClient.createTodoHistory({ description }).pipe(
+      map(({ message }) => {
+        return message;
       }),
     );
   }

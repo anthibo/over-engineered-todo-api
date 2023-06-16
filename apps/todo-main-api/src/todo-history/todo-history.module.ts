@@ -49,6 +49,6 @@ const InfrastructureLayerProviders: Provider[] = [TodoHistoryGrpcClient];
     ]),
   ],
   providers: [...InfrastructureLayerProviders, ...ApplicationLayerProviders],
-  exports: [...InfrastructureLayerProviders],
+  exports: [...InfrastructureLayerProviders, ...ApplicationLayerProviders],
 })
 export class TodoHistoryModule {}

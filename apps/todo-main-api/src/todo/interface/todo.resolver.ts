@@ -24,13 +24,17 @@ export class TodoResolver {
     return todos as unknown as TodoDto[];
   }
 
-  @Mutation(() => MessageResponseDto)
+  @Mutation(() => TodoDto)
   async createTodo(
     @Args('createTodoInput') createTodoInput: CreateTodoDto,
-  ): Promise<MessageResponseDto> {
+  ): Promise<TodoDto> {
     const command = new CreateTodoCommand(createTodoInput);
-    await this.commandBus.execute(command);
-    return { message: 'todo created' };
+    const todo = await this.commandBus.execute<
+      CreateTodoCommand,
+      Readonly<any>
+    >(command);
+    const todoDto = { ...todo, user: todo.user.user } as TodoDto;
+    return todoDto;
   }
 
   @Mutation(() => MessageResponseDto)

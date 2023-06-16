@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { TodoFactory } from '../../../domain/todo.factory';
 import { CreateTodoCommand } from './create-todo.command';
-import { TodoStatus } from '../../../domain/Todo';
+import { Todo, TodoStatus } from '../../../domain/Todo';
 import { TodoRepository } from '../../../domain/todo-repository.interface';
 import { Inject } from '@nestjs/common';
 import { InjectionToken } from '../../injection-tokens';
@@ -16,7 +16,7 @@ export class CreateTodoHandler implements ICommandHandler<CreateTodoCommand> {
     private readonly queryBus: QueryBus,
   ) {}
 
-  async execute({ createTodoRequest }: CreateTodoCommand): Promise<void> {
+  async execute({ createTodoRequest }: CreateTodoCommand): Promise<Todo> {
     const findUserQuery = new FindUserQuery(createTodoRequest.userId);
     const user = await this.queryBus.execute(findUserQuery);
     const todo = this.todoFactory.create({
@@ -26,5 +26,6 @@ export class CreateTodoHandler implements ICommandHandler<CreateTodoCommand> {
     });
     await this.todoRepository.save(todo);
     todo.commit();
+    return todo;
   }
 }

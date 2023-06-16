@@ -7,8 +7,6 @@ import {
 import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 
-import { map } from 'rxjs';
-
 @Injectable()
 export class TodoHistoryGrpcClient implements OnModuleInit {
   private readonly logger = new Logger(TodoHistoryGrpcClient.name);
@@ -26,21 +24,19 @@ export class TodoHistoryGrpcClient implements OnModuleInit {
     if (!this.historyPersistenceGrpcService) {
       console.log('Failed to get history-persistence service');
     } else {
+      console.log(
+        JSON.stringify(this.historyPersistenceGrpcService.createTodoHistory),
+      );
       console.log(this.historyPersistenceGrpcService);
     }
   }
 
-  async createTodoHistory(createHistoryDto: CreateTodoHistoryDto) {
+  createTodoHistory(createHistoryDto: CreateTodoHistoryDto) {
     this.logger.debug(
       `sending new grpc request to history-persistence service`,
     );
     return this.historyPersistenceGrpcService.createTodoHistory(
       createHistoryDto,
     );
-    // .pipe(
-    //   map(async ({ message }) => {
-    //     this.logger.debug(message);
-    //   }),
-    // );
   }
 }

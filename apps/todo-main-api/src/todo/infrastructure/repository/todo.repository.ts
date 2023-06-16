@@ -14,6 +14,7 @@ export class TodoRepositoryImpl implements TodoRepository {
   async findAll(): Promise<Todo[]> {
     const todoEntities = await this.todoDBEntity.findAll({
       include: [UserEntity],
+      order: [['createdAt', 'DESC']],
     });
     return todoEntities.map((todoEntity) =>
       this.todoDataMapper.toDomainModel(todoEntity),
@@ -33,9 +34,12 @@ export class TodoRepositoryImpl implements TodoRepository {
     await todoEntity.save();
   }
 
-  async save(todo: Todo): Promise<void> {
-    const todoEntity = this.todoDataMapper.toPersistenceEntity(todo);
-    await todoEntity.save();
+  async save(todo: Todo): Promise<Todo> {
+    const todoEntity = await this.todoDataMapper
+      .toPersistenceEntity(todo)
+      .save();
+    const todoDomainModel = this.todoDataMapper.toDomainModel(todoEntity);
+    return todoDomainModel;
   }
 
   async deleteById(id: string): Promise<void> {
